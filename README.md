@@ -1,10 +1,14 @@
 <h1 align="center">Hi 👋, I'm SkyNetCloud</h1>
 <h3 align="center">A passionate developer from Canada</h3>
 
+- 🔭 I’m currently working on **Cobble-Broadcaster-Forge**
+
 - 📫 How to reach me **mcboxer1201@gmail.com**
 
 <h3 align="left">Connect with me:</h3>
 <p align="left">
+<a href="https://twitter.com/skynetcloudttv" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/twitter.svg" alt="skynetcloudttv" height="30" width="40" /></a>
+<a href="https://discord.gg/g3TxEJuS7S" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/discord.svg" alt="g3TxEJuS7S" height="30" width="40" /></a>
 </p>
 
 <h3 align="left">Languages and Tools:</h3>

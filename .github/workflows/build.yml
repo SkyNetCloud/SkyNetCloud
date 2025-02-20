@@ -28,8 +28,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
         run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
+          git config --global user.name "SkyNetCloud"
+          git config --global user.email "mcboxer1201@gmail.com"
           git remote set-url origin https://SkyNetCloud:${GITHUB_TOKEN}@github.com/SkyNetCloud/SkyNetCloud.git
           git add README.md
           git commit -m "Updated current project to $LATEST_REPO" || exit 0

@@ -4,9 +4,6 @@ on:
   schedule:
     - cron: '0 * * * *'  # Runs every hour
   workflow_dispatch:  # Allows manual triggering
-  push:
-    branches:
-      - main  # You can specify which branch to trigger this for (e.g., `main` branch)
 
 permissions:
   contents: write
@@ -18,35 +15,24 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Fetch Latest Repo (by most recent push)
+      - name: Fetch Latest Repo
         id: fetch_repo
         run: |
-          # Fetch all repositories and sort by the most recent push
-          LATEST_REPO=$(curl -s "https://api.github.com/users/SkyNetCloud/repos?sort=pushed&per_page=100" | jq -r 'map(select(.name != "SkyNetCloud")) | .[0].name')
-          echo "LATEST_REPO=$LATEST_REPO"  # Debugging line
-          if [ -z "$LATEST_REPO" ]; then
-            echo "Error: Latest repo is empty. Check the repository fetching logic."
-            exit 1
-          fi
-          LATEST_REPO_URL="https://github.com/SkyNetCloud/$LATEST_REPO"
-          echo "LATEST_REPO_URL=$LATEST_REPO_URL" >> $GITHUB_ENV
+          LATEST_REPO=$(curl -s "https://api.github.com/users/SkyNetCloud/repos?sort=pushed&per_page=100" | jq -r 'map(select(.name != "SkyNetCloud")) | .[0].name')          LATEST_REPO_URL="https://github.com/SkyNetCloud/$LATEST_REPO"
           echo "LATEST_REPO=$LATEST_REPO" >> $GITHUB_ENV
+          echo "LATEST_REPO_URL=$LATEST_REPO_URL" >> $GITHUB_ENV
 
       - name: Update README
         run: |
-          # Update the README file with the name of the latest repository
           sed -i "s|\[.*\](https://github.com/SkyNetCloud/.*)|[$LATEST_REPO]($LATEST_REPO_URL)|" README.md
 
       - name: Commit & Push Changes
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
         run: |
           git config --global user.name "SkyNetCloud"
           git config --global user.email "mcboxer1201@gmail.com"
-          
-          # Ensure you are pushing to the correct repo URL
-          git remote set-url origin https://SkyNetCloud:${GITHUB_TOKEN}@github.com/SkyNetCloud/$LATEST_REPO.git
-          
+          git remote set-url origin https://SkyNetCloud:${GITHUB_TOKEN}@github.com/SkyNetCloud/SkyNetCloud.git
           git add README.md
           git commit -m "Updated current project to $LATEST_REPO" || exit 0
           git push origin main

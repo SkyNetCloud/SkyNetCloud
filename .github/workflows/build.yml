@@ -39,7 +39,7 @@ jobs:
 
       - name: Commit & Push Changes
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --global user.name "SkyNetCloud"
           git config --global user.email "mcboxer1201@gmail.com"

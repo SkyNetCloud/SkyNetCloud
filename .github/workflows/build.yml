@@ -4,6 +4,9 @@ on:
   schedule:
     - cron: '0 * * * *'  # Runs every hour
   workflow_dispatch:  # Allows manual triggering
+  push:
+    branches:
+      - main  # You can specify which branch to trigger this for (e.g., `main` branch)
 
 permissions:
   contents: write
@@ -15,16 +18,18 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Fetch Latest Repo
+      - name: Fetch Latest Repo (Other than main profile)
         id: fetch_repo
         run: |
-          LATEST_REPO=$(curl -s "https://api.github.com/users/SkyNetCloud/repos?sort=updated&per_page=1" | jq -r '.[0].name')
+          # Fetch the latest updated repo from the user account, excluding the main profile repo
+          LATEST_REPO=$(curl -s "https://api.github.com/users/SkyNetCloud/repos?sort=updated&per_page=1" | jq -r 'map(select(.name != "SkyNetCloud")) | .[0].name')
           LATEST_REPO_URL="https://github.com/SkyNetCloud/$LATEST_REPO"
           echo "LATEST_REPO=$LATEST_REPO" >> $GITHUB_ENV
           echo "LATEST_REPO_URL=$LATEST_REPO_URL" >> $GITHUB_ENV
 
       - name: Update README
         run: |
+          # Update the README file with the name of the latest repository
           sed -i "s|\[.*\](https://github.com/SkyNetCloud/.*)|[$LATEST_REPO]($LATEST_REPO_URL)|" README.md
 
       - name: Commit & Push Changes
@@ -33,7 +38,10 @@ jobs:
         run: |
           git config --global user.name "SkyNetCloud"
           git config --global user.email "mcboxer1201@gmail.com"
-          git remote set-url origin https://SkyNetCloud:${GITHUB_TOKEN}@github.com/SkyNetCloud/SkyNetCloud.git
+          
+          # Ensure you are pushing to the correct repo URL
+          git remote set-url origin https://SkyNetCloud:${GITHUB_TOKEN}@github.com/SkyNetCloud/$LATEST_REPO.git
+          
           git add README.md
           git commit -m "Updated current project to $LATEST_REPO" || exit 0
           git push origin main

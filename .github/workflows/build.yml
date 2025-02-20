@@ -8,7 +8,6 @@ on:
     branches:
       - main  # You can specify which branch to trigger this for (e.g., `main` branch)
 
-
 permissions:
   contents: write
 
@@ -19,14 +18,19 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Fetch Latest Repo (Other than main profile)
+      - name: Fetch Latest Repo (by most recent push)
         id: fetch_repo
         run: |
-          # Fetch the latest updated repo from the user account, excluding the main profile repo
-          LATEST_REPO=$(curl -s "https://api.github.com/users/SkyNetCloud/repos?sort=updated&per_page=1" | jq -r 'map(select(.name != "SkyNetCloud")) | .[0].name')
+          # Fetch all repositories and sort by the most recent push
+          LATEST_REPO=$(curl -s "https://api.github.com/users/SkyNetCloud/repos?sort=pushed&per_page=100" | jq -r 'map(select(.name != "SkyNetCloud")) | .[0].name')
+          echo "LATEST_REPO=$LATEST_REPO"  # Debugging line
+          if [ -z "$LATEST_REPO" ]; then
+            echo "Error: Latest repo is empty. Check the repository fetching logic."
+            exit 1
+          fi
           LATEST_REPO_URL="https://github.com/SkyNetCloud/$LATEST_REPO"
-          echo "LATEST_REPO=$LATEST_REPO" >> $GITHUB_ENV
           echo "LATEST_REPO_URL=$LATEST_REPO_URL" >> $GITHUB_ENV
+          echo "LATEST_REPO=$LATEST_REPO" >> $GITHUB_ENV
 
       - name: Update README
         run: |

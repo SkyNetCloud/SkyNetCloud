@@ -4,6 +4,10 @@ on:
   schedule:
     - cron: '0 * * * *'  # Runs every hour
   workflow_dispatch:  # Allows manual triggering
+  push:
+    branches:
+      - main  # You can specify which branch to trigger this for (e.g., `main` branch)
+
 
 permissions:
   contents: write

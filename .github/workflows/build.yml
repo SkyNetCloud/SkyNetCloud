@@ -3,11 +3,10 @@ name: Update GitHub Profile README
 on:
   schedule:
     - cron: '0 * * * *'  # Runs every hour
-  workflow_dispatch:  # Allows manual triggering
+  workflow_dispatch:
   push:
     branches:
-      - main  # You can specify which branch to trigger this for (e.g., `main` branch)
-
+      - main
 
 permissions:
   contents: write
@@ -19,20 +18,29 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Fetch Latest Repo
+      - name: Fetch Latest Repo Info
         id: fetch_repo
         run: |
-          LATEST_REPO=$(curl -s "https://api.github.com/users/SkyNetCloud/repos?sort=pushed&per_page=100" | jq -r 'map(select(.name != "SkyNetCloud")) | .[0].name')          LATEST_REPO_URL="https://github.com/SkyNetCloud/$LATEST_REPO"
+          REPOS=$(curl -s "https://api.github.com/users/SkyNetCloud/repos?sort=pushed&per_page=100")
+          FILTERED=$(echo "$REPOS" | jq 'map(select(.name != "SkyNetCloud"))')
+          LATEST_REPO=$(echo "$FILTERED" | jq -r '.[0].name')
+          IS_PRIVATE=$(echo "$FILTERED" | jq -r '.[0].private')
+
           echo "LATEST_REPO=$LATEST_REPO" >> $GITHUB_ENV
-          echo "LATEST_REPO_URL=$LATEST_REPO_URL" >> $GITHUB_ENV
+          echo "IS_PRIVATE=$IS_PRIVATE" >> $GITHUB_ENV
+          echo "LATEST_REPO_URL=https://github.com/SkyNetCloud/$LATEST_REPO" >> $GITHUB_ENV
 
       - name: Update README
         run: |
-          sed -i "s|\[.*\](https://github.com/SkyNetCloud/.*)|[$LATEST_REPO]($LATEST_REPO_URL)|" README.md
+          if [ "$IS_PRIVATE" = "true" ]; then
+            sed -i "s|\[.*\](https://github.com/SkyNetCloud/.*)|$LATEST_REPO|" README.md
+          else
+            sed -i "s|\[.*\](https://github.com/SkyNetCloud/.*)|[$LATEST_REPO]($LATEST_REPO_URL)|" README.md
+          fi
 
       - name: Commit & Push Changes
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --global user.name "SkyNetCloud"
           git config --global user.email "mcboxer1201@gmail.com"

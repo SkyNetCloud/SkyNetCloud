@@ -1,7 +1,7 @@
 <h1 align="center">Hi 👋, I'm SkyNetCloud</h1>
 <h3 align="center">A passionate developer from Canada</h3>
 
-- 🔭 I’m currently working on [sky-base](https://github.com/SkyNetCloud/sky-base)
+- 🔭 I’m currently working on [DiscordRankSync](https://github.com/SkyNetCloud/DiscordRankSync)
 
 - 📫 How to reach me **mcboxer1201@gmail.com**
 

@@ -22,9 +22,28 @@ jobs:
         id: fetch_repo
         run: |
           REPOS=$(curl -s "https://api.github.com/users/SkyNetCloud/repos?sort=pushed&per_page=100")
+
+          echo "GitHub API Response:"
+          echo "$REPOS"
+
+          # Check if the response is valid JSON and an array
+          if echo "$REPOS" | jq -e 'type != "array"' > /dev/null; then
+            echo "❌ Error: GitHub API did not return a valid array of repos."
+            exit 1
+          fi
+
+          # Filter out the repo with the same name as the username
           FILTERED=$(echo "$REPOS" | jq 'map(select(.name != "SkyNetCloud"))')
+
+          # Safely extract the latest repo name and privacy status
           LATEST_REPO=$(echo "$FILTERED" | jq -r '.[0].name')
           IS_PRIVATE=$(echo "$FILTERED" | jq -r '.[0].private')
+
+          # Fallback in case of null
+          if [ "$LATEST_REPO" = "null" ] || [ -z "$LATEST_REPO" ]; then
+            echo "❌ Error: No latest repository found."
+            exit 1
+          fi
 
           echo "LATEST_REPO=$LATEST_REPO" >> $GITHUB_ENV
           echo "IS_PRIVATE=$IS_PRIVATE" >> $GITHUB_ENV
@@ -32,6 +51,7 @@ jobs:
 
       - name: Update README
         run: |
+          echo "Updating README with repository: $LATEST_REPO"
           if [ "$IS_PRIVATE" = "true" ]; then
             sed -i "s|\[.*\](https://github.com/SkyNetCloud/.*)|$LATEST_REPO|" README.md
           else

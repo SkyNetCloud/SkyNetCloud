@@ -2,7 +2,7 @@ name: Update GitHub Profile README
 
 on:
   schedule:
-    - cron: '0 * * * *'  # Runs every hour
+    - cron: '0 13 * * 3'  # Every Wednesday at 13:00 UTC
   workflow_dispatch:
   push:
     branches:
@@ -20,8 +20,10 @@ jobs:
 
       - name: Fetch Latest Repo Info
         id: fetch_repo
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          REPOS=$(curl -s "https://api.github.com/users/SkyNetCloud/repos?sort=pushed&per_page=100")
+          REPOS=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/users/SkyNetCloud/repos?sort=pushed&per_page=100")
 
           echo "GitHub API Response:"
           echo "$REPOS"

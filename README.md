@@ -1,7 +1,7 @@
 <h1 align="center">Hi 👋, I'm SkyNetCloud</h1>
 <h3 align="center">A passionate developer from Canada</h3>
 
-- 🔭 I’m currently working on [CoreBotics](https://github.com/SkyNetCloud/CoreBotics)
+- 🔭 I’m currently working on [Draconic-ComputerCraft-Program](https://github.com/SkyNetCloud/Draconic-ComputerCraft-Program)
 
 - 📫 How to reach me **mcboxer1201@gmail.com**
 

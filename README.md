@@ -1,7 +1,7 @@
 <h1 align="center">Hi 👋, I'm SkyNetCloud</h1>
 <h3 align="center">A passionate developer from Canada</h3>
 
-- 🔭 I’m currently working on [lwjgl3ify](https://github.com/SkyNetCloud/lwjgl3ify)
+- 🔭 I’m currently working on [OldSchoolJail_Mod](https://github.com/SkyNetCloud/OldSchoolJail_Mod)
 
 - 📫 How to reach me **mcboxer1201@gmail.com**
 

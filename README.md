@@ -15,7 +15,7 @@
 
 ## 🧠 About Me
 
-- 🚀 **Latest Project:** CURRENT_PROJECT
+- 🚀 **Latest Project:** [truckersfm-api](https://github.com/SkyNetCloud/truckersfm-api)
 
 - 🌱 Learning more about **advanced modding & backend systems**
 

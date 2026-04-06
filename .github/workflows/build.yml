@@ -2,7 +2,7 @@ name: Update GitHub Profile README
 
 on:
   schedule:
-    - cron: '0 13 * * 3'  # Every Wednesday at 13:00 UTC
+    - cron: '0 13 * * 3' # Every Wednesday at 13:00 UTC
   workflow_dispatch:
   push:
     branches:
@@ -14,59 +14,74 @@ permissions:
 jobs:
   update-readme:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Repository
+      - name: 📥 Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Fetch Latest Repo Info
+      - name: 📦 Install jq
+        run: sudo apt-get install -y jq
+
+      - name: 🔍 Fetch Latest Public Repo
         id: fetch_repo
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          REPOS=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/users/SkyNetCloud/repos?sort=pushed&per_page=100")
+          echo "Fetching repositories..."
 
-          echo "GitHub API Response:"
-          echo "$REPOS"
+          REPOS=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+          "https://api.github.com/users/SkyNetCloud/repos?sort=pushed&per_page=100")
 
-          # Check if the response is valid JSON and an array
+          # Validate response
           if echo "$REPOS" | jq -e 'type != "array"' > /dev/null; then
-            echo "❌ Error: GitHub API did not return a valid array of repos."
+            echo "❌ Invalid GitHub API response"
             exit 1
           fi
 
-          # Filter out the repo with the same name as the username
-          FILTERED=$(echo "$REPOS" | jq 'map(select(.name != "SkyNetCloud"))')
+          # Filter:
+          # - Exclude profile repo
+          # - Exclude forks
+          # - Only public repos
+          FILTERED=$(echo "$REPOS" | jq '
+            map(select(
+              .name != "SkyNetCloud" and
+              .fork == false and
+              .private == false
+            ))
+          ')
 
-          # Safely extract the latest repo name and privacy status
           LATEST_REPO=$(echo "$FILTERED" | jq -r '.[0].name')
-          IS_PRIVATE=$(echo "$FILTERED" | jq -r '.[0].private')
 
-          # Fallback in case of null
           if [ "$LATEST_REPO" = "null" ] || [ -z "$LATEST_REPO" ]; then
-            echo "❌ Error: No latest repository found."
+            echo "❌ No valid repository found"
             exit 1
           fi
+
+          echo "Latest repo: $LATEST_REPO"
 
           echo "LATEST_REPO=$LATEST_REPO" >> $GITHUB_ENV
-          echo "IS_PRIVATE=$IS_PRIVATE" >> $GITHUB_ENV
           echo "LATEST_REPO_URL=https://github.com/SkyNetCloud/$LATEST_REPO" >> $GITHUB_ENV
 
-      - name: Update README
+      - name: ✏️ Update README
         run: |
-          echo "Updating README with repository: $LATEST_REPO"
-          if [ "$IS_PRIVATE" = "true" ]; then
-            sed -i "s|\[.*\](https://github.com/SkyNetCloud/.*)|$LATEST_REPO|" README.md
-          else
-            sed -i "s|\[.*\](https://github.com/SkyNetCloud/.*)|[$LATEST_REPO]($LATEST_REPO_URL)|" README.md
-          fi
+          echo "Updating README..."
 
-      - name: Commit & Push Changes
+          sed -i "s|CURRENT_PROJECT|[$LATEST_REPO]($LATEST_REPO_URL)|g" README.md
+
+      - name: ✅ Commit & Push (Only if changed)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --global user.name "SkyNetCloud"
           git config --global user.email "mcboxer1201@gmail.com"
-          git remote set-url origin https://SkyNetCloud:${GITHUB_TOKEN}@github.com/SkyNetCloud/SkyNetCloud.git
+
+          if git diff --quiet; then
+            echo "✅ No changes to commit"
+            exit 0
+          fi
+
           git add README.md
-          git commit -m "Updated current project to $LATEST_REPO" || exit 0
+          git commit -m "🔄 Updated latest project to $LATEST_REPO"
+
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/SkyNetCloud/SkyNetCloud.git
           git push origin main

@@ -38,7 +38,7 @@
 <p align="center">
   <img src="http://github-profile-summary-cards.vercel.app/api/cards/stats?username=SkyNetCloud&theme=nord_dark" />
   <img src="http://github-profile-summary-cards.vercel.app/api/cards/repos-per-language?username=SkyNetCloud&theme=nord_dark" />
-  <img src="http://github-profile-summary-cards.vercel.app/api/cards/repos-per-language?username=SkyNetCloud&theme=nord_dark" />
+  <img src="http://github-profile-summary-cards.vercel.app/api/cards/productive-time?username=SkyNetCloud&theme=nord_dark&utcOffset=8" />
 </p>
 
 ---

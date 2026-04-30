@@ -15,7 +15,7 @@
 
 ## 🧠 About Me
 
-- 🚀 **Latest Project:** <!--START_SECTION:latest--><!--END_SECTION:latest-->
+- 🚀 **Latest Project:** <!--START_SECTION:latest-->[Immersive-Frequencies-Mod-Fabric](https://github.com/SkyNetCloud/Immersive-Frequencies-Mod-Fabric)<!--END_SECTION:latest-->
 
 - 🌱 Learning more about **advanced modding & backend systems**
 

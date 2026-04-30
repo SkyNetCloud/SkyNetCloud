@@ -22,7 +22,7 @@ jobs:
       - name: 📦 Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
-      - name: 🔍 Fetch ALL Public Repos and Find Latest Push
+      - name: 🔍 Fetch ALL Public Repos (INCLUDING FORKS)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -42,11 +42,10 @@ jobs:
             fi
 
             ALL_REPOS=$(echo "$ALL_REPOS $RESPONSE" | jq -s 'add')
-
             PAGE=$((PAGE+1))
           done
 
-          # Validate response
+          # Validate
           if echo "$ALL_REPOS" | jq -e 'type != "array"' > /dev/null; then
             echo "❌ Invalid GitHub API response"
             exit 1
@@ -54,16 +53,18 @@ jobs:
 
           echo "Total repos fetched: $(echo "$ALL_REPOS" | jq length)"
 
-          # Filter public, non-fork repos
+          # ✅ KEEP forks now (removed .fork == false)
           FILTERED=$(echo "$ALL_REPOS" | jq '
             map(select(
               .name != "SkyNetCloud" and
-              .fork == false and
               .private == false
             ))
           ')
 
-          # Find true latest pushed repo
+          # Debug (optional)
+          echo "$FILTERED" | jq -r '.[] | "\(.name) | fork=\(.fork) | pushed=\(.pushed_at)"' | sort -r
+
+          # ✅ TRUE latest push across ALL repos (including forks)
           LATEST_REPO=$(echo "$FILTERED" | jq -r '
             sort_by(.pushed_at) | reverse | .[0].name
           ')

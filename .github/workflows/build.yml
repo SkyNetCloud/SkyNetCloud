@@ -2,7 +2,7 @@ name: Update GitHub Profile README
 
 on:
   schedule:
-    - cron: '0 13 * * *' # Every day at ~9 AM local (EDT)
+    - cron: '0 13 * * *' # Daily ~9 AM (EDT)
   workflow_dispatch:
   push:
     branches:
@@ -22,24 +22,40 @@ jobs:
       - name: 📦 Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
-      - name: 🔍 Fetch Latest Public Repo (by actual push time)
-        id: fetch_repo
+      - name: 🔍 Fetch ALL Public Repos and Find Latest Push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "Fetching repositories..."
+          echo "Fetching ALL repositories..."
 
-          REPOS=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
-          "https://api.github.com/users/SkyNetCloud/repos?per_page=100")
+          ALL_REPOS="[]"
+          PAGE=1
+
+          while : ; do
+            RESPONSE=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+              "https://api.github.com/users/SkyNetCloud/repos?per_page=100&page=$PAGE")
+
+            COUNT=$(echo "$RESPONSE" | jq 'length')
+
+            if [ "$COUNT" -eq 0 ]; then
+              break
+            fi
+
+            ALL_REPOS=$(echo "$ALL_REPOS $RESPONSE" | jq -s 'add')
+
+            PAGE=$((PAGE+1))
+          done
 
           # Validate response
-          if echo "$REPOS" | jq -e 'type != "array"' > /dev/null; then
+          if echo "$ALL_REPOS" | jq -e 'type != "array"' > /dev/null; then
             echo "❌ Invalid GitHub API response"
             exit 1
           fi
 
-          # Filter repos
-          FILTERED=$(echo "$REPOS" | jq '
+          echo "Total repos fetched: $(echo "$ALL_REPOS" | jq length)"
+
+          # Filter public, non-fork repos
+          FILTERED=$(echo "$ALL_REPOS" | jq '
             map(select(
               .name != "SkyNetCloud" and
               .fork == false and
@@ -47,7 +63,7 @@ jobs:
             ))
           ')
 
-          # Sort by pushed_at (REAL latest push)
+          # Find true latest pushed repo
           LATEST_REPO=$(echo "$FILTERED" | jq -r '
             sort_by(.pushed_at) | reverse | .[0].name
           ')
@@ -57,16 +73,16 @@ jobs:
             exit 1
           fi
 
-          echo "Latest repo: $LATEST_REPO"
+          echo "✅ Latest pushed repo: $LATEST_REPO"
 
           echo "LATEST_REPO=$LATEST_REPO" >> $GITHUB_ENV
           echo "LATEST_REPO_URL=https://github.com/SkyNetCloud/$LATEST_REPO" >> $GITHUB_ENV
 
-      - name: ✏️ Update README (safe marker replace)
+      - name: ✏️ Update README (one-line safe replace)
         run: |
           echo "Updating README..."
 
-          sed -i "/<!--START_SECTION:latest-->/, /<!--END_SECTION:latest-->/c\<!--START_SECTION:latest-->\[$LATEST_REPO]($LATEST_REPO_URL)\<!--END_SECTION:latest-->" README.md
+          sed -i "s|<!--START_SECTION:latest-->.*<!--END_SECTION:latest-->|<!--START_SECTION:latest-->[$LATEST_REPO]($LATEST_REPO_URL)<!--END_SECTION:latest-->|" README.md
 
       - name: ✅ Commit & Push (Only if changed)
         env:

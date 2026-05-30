@@ -15,7 +15,7 @@
 
 ## 🧠 About Me
 
-- 🚀 **Latest Project:** <!--START_SECTION:latest-->[eZWeight-Mod-Fabric](https://github.com/SkyNetCloud/eZWeight-Mod-Fabric)<!--END_SECTION:latest-->
+- 🚀 **Latest Project:** <!--START_SECTION:latest-->[Voiceless-Survival](https://github.com/SkyNetCloud/Voiceless-Survival)<!--END_SECTION:latest-->
 
 - 🌱 Learning more about **advanced modding & backend systems**
 

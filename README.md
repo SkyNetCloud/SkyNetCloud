@@ -9,7 +9,7 @@
 
 <p align="center">
   <img src="https://readme-typing-svg.herokuapp.com?color=00F7FF&center=true&vCenter=true&lines=Java+%7C+C%23+%7C+C%2B%2B+Developer;Minecraft+Modder;Always+building+cool+stuff" />
-</p>
+</p> 
 
 ---
 
